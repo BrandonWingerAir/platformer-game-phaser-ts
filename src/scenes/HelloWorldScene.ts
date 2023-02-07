@@ -10,12 +10,45 @@ export default class HelloWorldScene extends Phaser.Scene
     private score = 0
     private scoreText?: Phaser.GameObjects.Text
 
+    private bombs?: Phaser.Physics.Arcade.Group
+
+    private gameOver = false
+
     private handleCollectStar(player: Phaser.GameObjects.GameObject, starObject: Phaser.GameObjects.GameObject) {
         const star = starObject as Phaser.Physics.Arcade.Image
         star.disableBody(true, true)
 
         this.score += 10
         this.scoreText?.setText(`Score: ${this.score}`)
+
+        if (this.stars?.countActive(true) === 0)
+        {
+            this.stars.children.iterate(starObject => {
+                const child = starObject as Phaser.Physics.Arcade.Image
+                child.enableBody(true, child.x, 0, true, true)
+            })
+
+            if (this.player)
+            {
+                const x = this.player.x < 400
+                    ? Phaser.Math.Between(400, 800)
+                    : Phaser.Math.Between(0, 400)
+
+                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(x, 16, 'bomb')
+                bomb.setBounce(1)
+                bomb.setCollideWorldBounds(true)
+                bomb.setVelocityY(Phaser.Math.Between(-200, 200), 20)
+            }
+        }
+    }
+
+    private handleTouchBomb(player: Phaser.GameObjects.GameObject, bombObject: Phaser.GameObjects.GameObject) {
+        this.physics.pause()
+
+        this.player?.setTint(0xff0000)
+        this.player?.anims.play('turn')
+        
+        this.gameOver = true
     }
 
 	constructor()
@@ -97,8 +130,13 @@ export default class HelloWorldScene extends Phaser.Scene
 
         this.scoreText = this.add.text(16, 16, 'score: 0', {
             fontSize: '32px',
-            fill: '#000'
+            color: '#000'
         })
+
+        this.bombs = this.physics.add.group()
+
+        this.physics.add.collider(this.bombs, this.platforms)
+        this.physics.add.collider(this.player, this.bombs, this.handleTouchBomb, undefined, this)
     }
 
     update() {
