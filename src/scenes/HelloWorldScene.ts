@@ -10,8 +10,14 @@ export default class HelloWorldScene extends Phaser.Scene
     private score = 0
     private scoreText?: Phaser.GameObjects.Text
 
+    private titleText?: Phaser.GameObjects.Text
+    private startText?: Phaser.GameObjects.Text
+    private gameOverText?: Phaser.GameObjects.Text
+    private restartText?: Phaser.GameObjects.Text
+
     private bombs?: Phaser.Physics.Arcade.Group
 
+    private gameStart = false
     private gameOver = false
 
     private handleCollectStar(player: Phaser.GameObjects.GameObject, starObject: Phaser.GameObjects.GameObject) {
@@ -20,6 +26,23 @@ export default class HelloWorldScene extends Phaser.Scene
 
         this.score += 10
         this.scoreText?.setText(`Score: ${this.score}`)
+
+        if (this.stars?.countActive(true) === 11)
+        {
+            this.titleText?.destroy()
+
+            if (this.player)
+            {
+                const x = this.player.x < 400
+                    ? Phaser.Math.Between(400, 800)
+                    : Phaser.Math.Between(0, 400)
+
+                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(x, 16, 'bomb')
+                bomb.setBounce(1)
+                bomb.setCollideWorldBounds(true)
+                bomb.setVelocityY(Phaser.Math.Between(-200, 200), 20)
+            }
+        }
 
         if (this.stars?.countActive(true) === 0)
         {
@@ -47,6 +70,16 @@ export default class HelloWorldScene extends Phaser.Scene
 
         this.player?.setTint(0xff0000)
         this.player?.anims.play('turn')
+
+        this.gameOverText = this.add.text(240, 55, 'GAME OVER', {
+            fontSize: '58px',
+            color: '#fff'
+        })
+
+        this.restartText = this.add.text(212, 130, 'Press space to restart', {
+            fontSize: '28px',
+            color: '#fff'
+        })
         
         this.gameOver = true
     }
@@ -81,6 +114,18 @@ export default class HelloWorldScene extends Phaser.Scene
         this.platforms.create(600, 400, 'ground')
         this.platforms.create(50, 250, 'ground')
         this.platforms.create(750, 220, 'ground')
+
+        if (this.gameStart === false) {
+            this.titleText = this.add.text(140, 55, 'STAR COLLECTOR', {
+                fontSize: '64px',
+                color: '#fff'
+            })
+
+            this.startText = this.add.text(188, 130, 'Press an arrow key to move', {
+                fontSize: '28px',
+                color: '#fff'
+            })
+        }
 
         this.player = this.physics.add.sprite(100, 450, 'dude')
         this.player.setBounce(0.2)
@@ -130,7 +175,7 @@ export default class HelloWorldScene extends Phaser.Scene
 
         this.scoreText = this.add.text(16, 16, 'score: 0', {
             fontSize: '32px',
-            color: '#000'
+            color: '#fff'
         })
 
         this.bombs = this.physics.add.group()
@@ -147,12 +192,14 @@ export default class HelloWorldScene extends Phaser.Scene
 
         if (this.cursors.left?.isDown) 
         {
+            this.gameStart = true
             this.player?.setVelocityX(-160)
             this.player?.anims.play('left', true)
         }
 
         else if (this.cursors.right?.isDown) 
         {
+            this.gameStart = true
             this.player?.setVelocityX(160)
             this.player?.anims.play('right', true)
         }
@@ -167,5 +214,19 @@ export default class HelloWorldScene extends Phaser.Scene
         {
             this.player.setVelocity(-330)
         } 
+
+        if (this.gameStart === true) {
+            this.startText?.destroy()
+        }
+
+        if (this.gameOver === true) {
+            if (this.cursors.space?.isDown) {
+                this.registry.destroy()
+                this.events.off()
+                this.scene.restart()
+            }
+
+            this.gameStart = false;
+        }
     }
 }
