@@ -65,23 +65,30 @@ export default class HelloWorldScene extends Phaser.Scene
         }
     }
 
-    private handleTouchBomb(player: Phaser.GameObjects.GameObject, bombObject: Phaser.GameObjects.GameObject) {
-        this.physics.pause()
+    private handleTouchBomb(player: Phaser.Physics.Arcade.Image, bombObject: Phaser.Physics.Arcade.Sprite) {    
+        if (bombObject?.body.touching.up && player?.body.touching.down) {
+            bombObject.destroy()
+        }
+        else {
+            this.physics.pause()
 
-        this.player?.setTint(0xff0000)
-        this.player?.anims.play('turn')
+            this.player?.setTint(0xff0000)
+            this.player?.anims.play('turn')
 
-        this.gameOverText = this.add.text(240, 55, 'GAME OVER', {
-            fontSize: '58px',
-            color: '#fff'
-        })
+            this.gameOverText = this.add.text(240, 55, 'GAME OVER', {
+                fontSize: '58px',
+                color: '#fff'
+            })
 
-        this.restartText = this.add.text(212, 130, 'Press space to restart', {
-            fontSize: '28px',
-            color: '#fff'
-        })
+            this.restartText = this.add.text(212, 130, 'Press space to restart', {
+                fontSize: '28px',
+                color: '#fff'
+            })
+            
+            this.gameOver = true
+        }
         
-        this.gameOver = true
+        
     }
 
 	constructor()
