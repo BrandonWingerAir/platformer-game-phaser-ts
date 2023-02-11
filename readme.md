@@ -5,7 +5,11 @@
 
 ## Demo
 
-Coming Soon!
+[Play Now](https://brandonwingerair.github.io/platformer-game-phaser-ts/)
+
+## Screenshot
+
+![Start Screen](https://i.ibb.co/mc2DmXj/Brandon-Winger-Air.png)
 
 ## Features
 
