@@ -15,7 +15,7 @@ export default class HelloWorldScene extends Phaser.Scene
     private gameOverText?: Phaser.GameObjects.Text
     private restartText?: Phaser.GameObjects.Text
 
-    private bombs?: Phaser.Physics.Arcade.Group
+    private ufos?: Phaser.Physics.Arcade.Group
 
     private gameStart = false
     private gameOver = false
@@ -37,10 +37,10 @@ export default class HelloWorldScene extends Phaser.Scene
                     ? Phaser.Math.Between(400, 800)
                     : Phaser.Math.Between(0, 400)
 
-                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(x, 16, 'bomb')
-                bomb.setBounce(1)
-                bomb.setCollideWorldBounds(true)
-                bomb.setVelocityY(Phaser.Math.Between(-200, 200), 20)
+                const ufo: Phaser.Physics.Arcade.Image = this.ufos?.create(x, 16, 'ufo')
+                ufo.setBounce(1)
+                ufo.setCollideWorldBounds(true)
+                ufo.setVelocityY(Phaser.Math.Between(-200, 200), 20)
             }
         }
 
@@ -57,17 +57,17 @@ export default class HelloWorldScene extends Phaser.Scene
                     ? Phaser.Math.Between(400, 800)
                     : Phaser.Math.Between(0, 400)
 
-                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(x, 16, 'bomb')
-                bomb.setBounce(1)
-                bomb.setCollideWorldBounds(true)
-                bomb.setVelocityY(Phaser.Math.Between(-200, 200), 20)
+                const ufo: Phaser.Physics.Arcade.Image = this.ufos?.create(x, 16, 'ufo')
+                ufo.setBounce(1)
+                ufo.setCollideWorldBounds(true)
+                ufo.setVelocityY(Phaser.Math.Between(-200, 200), 20)
             }
         }
     }
 
-    private handleTouchBomb(player: Phaser.Physics.Arcade.Image, bombObject: Phaser.Physics.Arcade.Sprite) {    
-        if (bombObject?.body.touching.up && player?.body.touching.down) {
-            bombObject.destroy()
+    private handleTouchUFO(player: Phaser.Physics.Arcade.Image, ufoObject: Phaser.Physics.Arcade.Sprite) {    
+        if (ufoObject?.body.touching.up && player?.body.touching.down) {
+            ufoObject.destroy()
         }
         else {
             this.physics.pause()
@@ -101,7 +101,7 @@ export default class HelloWorldScene extends Phaser.Scene
         this.load.image('sky', 'assets/sky.png')
         this.load.image('ground', 'assets/platform.png')
         this.load.image('star', 'assets/star.png')
-        this.load.image('bomb', 'assets/bomb.png')
+        this.load.image('ufo', 'assets/ufo.png')
         this.load.spritesheet('dude', 'assets/dude.png', { 
             frameWidth: 32, frameHeight: 48 
         })
@@ -185,10 +185,10 @@ export default class HelloWorldScene extends Phaser.Scene
             color: '#fff'
         })
 
-        this.bombs = this.physics.add.group()
+        this.ufos = this.physics.add.group()
 
-        this.physics.add.collider(this.bombs, this.platforms)
-        this.physics.add.collider(this.player, this.bombs, this.handleTouchBomb, undefined, this)
+        this.physics.add.collider(this.ufos, this.platforms)
+        this.physics.add.collider(this.player, this.ufos, this.handleTouchUFO, undefined, this)
     }
 
     update() {
